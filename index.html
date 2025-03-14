@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-upload {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .add-new-patient {
+            background-color: #5cb85c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .add-new-patient:hover {
+            background-color: #449d44;
+        }
+
+        .patient-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .patient-table th, .patient-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .patient-table th {
+            background-color: #f2f2f2;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            animation-name: animatetop;
+            animation-duration: 0.4s
+        }
+
+        @keyframes animatetop {
+            from {
+                top: -300px;
+                opacity: 0
+            }
+            to {
+                top: 0;
+                opacity: 1
+            }
+        }
+
+        .modal-content input[type=text],
+        .modal-content input[type=date],
+        .modal-content select {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .modal-content button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: auto;
+        }
+
+        .modal-content button:hover {
+            opacity: 0.8;
+        }
+
+        .cancelbtn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .cancelbtn:hover {
+            background-color: #da190b;
+        }
+
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        @media screen and (max-width: 600px) {
+            .patient-table {
+                font-size: 12px;
+            }
+
+            .patient-table th, .patient-table td {
+                padding: 6px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="file-upload">
+        <input type="file" id="fileInput" name="file" accept=".xlsx, .xls">
+    </div>
+
+    <input type="text" id="searchInput" class="search-input" placeholder="Search patients...">
+
+    <button class="add-new-patient" onclick="openModal()">Add New Patient</button>
+
+    <table class="patient-table" id="patientTable">
+        <thead>
+        <tr>
+            <th>Pt file number</th>
+            <th>hospital name</th>
+            <th>date</th>
+            <th>DEATH</th>
+            <th>Gender</th>
+            <th>Ht CM</th>
+            <th>wt</th>
+            <th>BMI</th>
+            <th>BSA</th>
+            <th>HTN</th>
+            <th>EF</th>
+            <th>Age</th>
+            <th>DM</th>
+            <th>ES</th>
+            <th>Pre HGB</th>
+            <th>post HGB</th>
+            <th>Pre ALT</th>
+            <th>Post ALT</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span onclick="closeModal()" style="float:right; cursor:pointer;">&times;</span>
+            <h2>Add New Patient</h2>
+            <input type="text" placeholder="Pt file number :">
+            <input type="text" placeholder="hospital name :">
+            <input type="date" placeholder="date :">
+            <input type="text" placeholder="DEATH:">
+            <input type="text" placeholder="Gender:">
+            <input type="text" placeholder="Ht CM:">
+            <div class="clearfix">
+                <button type="button" onclick="closeModal()" class="cancelbtn">Cancel</button>
+                <button type="button" class="signupbtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script>
+    // Function to open the modal
+    function openModal() {
+        document.getElementById("myModal").style.display = "block";
+    }
+
+    // Function to close the modal
+    function closeModal() {
+        document.getElementById("myModal").style.display = "none";
+    }
+
+    // Close the modal if the user clicks outside of it
+    window.onclick = function (event) {
+        if (event.target == document.getElementById("myModal")) {
+            closeModal();
+        }
+    }
+
+    document.getElementById('fileInput').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+
+            populateTable(jsonData);
+        };
+
+        reader.readAsArrayBuffer(file);
+    });
+
+    function populateTable(data) {
+        const table = document.getElementById('patientTable').getElementsByTagName('tbody')[0];
+        table.innerHTML = ""; // Clear existing table data
+
+        // Assuming the first row is the header row
+        const headers = data[0];
+        const tableData = data.slice(1); // Data without headers
+
+        tableData.forEach(row => {
+            let newRow = table.insertRow();
+            row.forEach(cellData => {
+                let cell = newRow.insertCell();
+                cell.textContent = cellData;
+            });
+        });
+    }
+</script>
+
+</body>
+</html>
